@@ -215,5 +215,56 @@ function drawClock() {
         typeSpeed: 60, backSpeed: 30, backDelay: 1500, loop: true
       });
     </script>
+    <!---------Joke and other API here using fetch because its easier to understand and thats what I found online for the comic------------>
+    <div id="joke">Loading a joke...</div>
+    <p class="text-muted small">Joke content is provided by the third-party jokeAPI (v2.jokeapi.dev). I do not own or endorse it.</p>
+    <script>
+      function loadJoke() {
+        var url = 'https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,religious,political,racist,sexist,explicit';
+        fetch(url)
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (data.type === 'single') { $('#joke').text(data.joke); }
+            else if (data.type === 'twopart') { $('#joke').html(data.setup + '<br>' + data.delivery); }
+            else { $('#joke').text('Could not load a joke right now.'); }
+          })
+          .catch(function () { $('#joke').text('Could not load a joke right now.'); });
+      }
+      $(document).ready(function () {
+        loadJoke();
+        setInterval(loadJoke, 60000); // new joke every 60 seconds
+      });
+    </script>
+    <!-- xkcd random comic -->
+<div id="xkcd">
+  <h5 id="xkcd-title"></h5>
+  <img id="xkcd-img" alt="" style="max-width:100%;height:auto;">
+  <p id="xkcd-alt" class="text-muted small"></p>
+  <button id="xkcd-next" type="button">Another comic</button>
+</div>
+<p class="text-muted small">Comic provided by xkcd (xkcd.com) via the xkcd.vercel.app API. I do not own this content.</p>
+<script>
+	function loadRandomXkcd() {
+  // Random comic loader... 1) latest comic number = our upper bound
+  fetch('https://xkcd.vercel.app/?comic=latest')
+    .then(function (res) { return res.json(); })
+    .then(function (latest) {
+      var n = Math.floor(Math.random() * latest.num) + 1; // 1 .. latest
+      if (n === 404) { n = 405; }                          // #404 intentionally doesn't exist
+      return fetch('https://xkcd.vercel.app/?comic=' + n).then(function (r) { return r.json(); });
+    })
+    .then(function (comic) {
+      $('#xkcd-title').text('#' + comic.num + ' - ' + comic.title);
+      $('#xkcd-img').attr('src', comic.img).attr('alt', comic.alt);
+      $('#xkcd-alt').text(comic.alt);
+    })
+    .catch(function () { $('#xkcd-title').text('Could not load a comic right now.'); });
+}
+
+$(document).ready(function () {
+  loadRandomXkcd();
+  $('#xkcd-next').on('click', loadRandomXkcd);
+});
+</script>
     </body>
 </html>
