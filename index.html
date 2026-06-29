@@ -266,5 +266,22 @@ $(document).ready(function () {
   $('#xkcd-next').on('click', loadRandomXkcd);
 });
 </script>
+<div id="visit-message"></div>
+    <script>
+      $(document).ready(function () {
+        var msg;
+        var match = document.cookie.match(/(?:^|;\s*)lastVisit=([^;]+)/);
+        if (!match) {
+          msg = 'Welcome to my homepage for the first time!';
+        } else {
+          msg = 'Welcome back! Your last visit was ' + decodeURIComponent(match[1]);
+        }
+        $('#visit-message').text(msg);
+        var now = new Date();
+        var expires = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000).toUTCString();
+        document.cookie = 'lastVisit=' + encodeURIComponent(now.toLocaleString()) + '; expires=' + expires + '; path=/';
+      });
+    </script>
     </body>
+
 </html>
